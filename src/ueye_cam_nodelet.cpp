@@ -105,6 +105,16 @@ UEyeCamNodelet::UEyeCamNodelet():
   cam_params_.gain_boost = 0;
   cam_params_.auto_exposure = false;
   cam_params_.exposure = DEFAULT_EXPOSURE;
+
+/////////////////////////////////////////////////////////////////////////////
+  cam_params_.auto_reference = 0;
+  cam_params_.auto_shutter_max = 0;
+  cam_params_.auto_gain_max = 0;
+  cam_params_.auto_brightness_once = false;
+  cam_params_.auto_speed = 0;
+  cam_params_.auto_hysteresis = 0;
+/////////////////////////////////////////////////////////////////////////////
+
   cam_params_.auto_white_balance = false;
   cam_params_.white_balance_red_offset = 0;
   cam_params_.white_balance_blue_offset = 0;
@@ -190,8 +200,22 @@ void UEyeCamNodelet::onInit() {
       "Green Gain:\t\t" << cam_params_.green_gain << endl <<
       "Blue Gain:\t\t" << cam_params_.blue_gain << endl <<
       "Gain Boost:\t\t" << cam_params_.gain_boost << endl <<
+
+      "AOI Width:\t\t\t" << cam_params_.aoi_width << endl <<
+      "AOI Height:\t\t\t" << cam_params_.aoi_height << endl <<
+      "AOI Left Pos.:\t\t" << cam_params_.aoi_left << endl <<
+      "AOI Top Pos.:\t\t" << cam_params_.aoi_top << endl <<
+
       "Auto Exposure:\t\t" << cam_params_.auto_exposure << endl <<
       "Exposure (ms):\t\t" << cam_params_.exposure << endl <<
+
+      "Reference:\t\t" << cam_params_.auto_reference << endl <<
+      "Auto shutter max:\t" << cam_params_.auto_shutter_max << endl <<
+      "Auto gain max:\t\t" << cam_params_.auto_gain_max << endl <<
+      "Auto brightness once:\t" << cam_params_.auto_brightness_once << endl <<
+      "Auto speed:\t\t" << cam_params_.auto_speed << endl <<
+      "Auto hysteresis:\t" << cam_params_.auto_hysteresis << endl <<
+
       "Auto White Balance:\t" << cam_params_.auto_white_balance << endl <<
       "WB Red Offset:\t\t" << cam_params_.white_balance_red_offset << endl <<
       "WB Blue Offset:\t\t" << cam_params_.white_balance_blue_offset << endl <<
@@ -349,6 +373,63 @@ INT UEyeCamNodelet::parseROSParams(ros::NodeHandle& local_nh) {
       hasNewParams = true;
     }
   }
+
+/////////////////////////////////////////////////////////////////////////////
+
+if (local_nh.hasParam("aoi_width")) {
+  local_nh.getParam("aoi_width", cam_params_.aoi_width);
+  if (cam_params_.aoi_width != prevCamParams.aoi_width) {
+    if (cam_params_.aoi_width < 16 || cam_params_.aoi_width > 4912) {
+      WARN_STREAM("Invalid requested aoi_width: " << cam_params_.aoi_width <<
+        "; using current aoi_width: " << prevCamParams.aoi_width);
+      cam_params_.aoi_width = prevCamParams.aoi_width;
+    } else {
+      hasNewParams = true;
+    }
+  }
+}
+
+if (local_nh.hasParam("aoi_height")) {
+  local_nh.getParam("aoi_height", cam_params_.aoi_height);
+  if (cam_params_.aoi_height != prevCamParams.aoi_height) {
+    if (cam_params_.aoi_height < 4 || cam_params_.aoi_height > 3684) {
+      WARN_STREAM("Invalid requested aoi_height: " << cam_params_.aoi_height <<
+        "; using current aoi_height: " << prevCamParams.aoi_height);
+      cam_params_.aoi_height = prevCamParams.aoi_height;
+    } else {
+      hasNewParams = true;
+    }
+  }
+}
+
+if (local_nh.hasParam("aoi_left")) {
+  local_nh.getParam("aoi_left", cam_params_.aoi_left);
+  if (cam_params_.aoi_left != prevCamParams.aoi_left) {
+    if (cam_params_.aoi_left < 0 || cam_params_.aoi_left > 2560) {
+      WARN_STREAM("Invalid requested aoi_left: " << cam_params_.aoi_left <<
+        "; using current aoi_left: " << prevCamParams.aoi_left);
+      cam_params_.aoi_left = prevCamParams.aoi_left;
+    } else {
+      hasNewParams = true;
+    }
+  }
+}
+
+if (local_nh.hasParam("aoi_top")) {
+  local_nh.getParam("aoi_top", cam_params_.aoi_top);
+  if (cam_params_.aoi_top != prevCamParams.aoi_top) {
+    if (cam_params_.aoi_top < 0 || cam_params_.aoi_top > 1920) {
+      WARN_STREAM("Invalid requested aoi_top: " << cam_params_.aoi_top <<
+        "; using current aoi_top: " << prevCamParams.aoi_top);
+      cam_params_.aoi_top = prevCamParams.aoi_top;
+    } else {
+      hasNewParams = true;
+    }
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
   if (local_nh.hasParam("auto_exposure")) {
     local_nh.getParam("auto_exposure", cam_params_.auto_exposure);
     if (cam_params_.auto_exposure != prevCamParams.auto_exposure) {
@@ -367,6 +448,81 @@ INT UEyeCamNodelet::parseROSParams(ros::NodeHandle& local_nh) {
       }
     }
   }
+
+/////////////////////////////////////////////////////////////////////////////
+  if (local_nh.hasParam("auto_reference")) {
+    local_nh.getParam("auto_reference", cam_params_.auto_reference);
+    if (cam_params_.auto_reference != prevCamParams.auto_reference) {
+      if (cam_params_.auto_reference < 0 || cam_params_.auto_reference > 255) {
+        WARN_STREAM("Invalid requested auto_reference: " << cam_params_.auto_reference <<
+          "; using current auto_reference: " << prevCamParams.auto_reference);
+        cam_params_.auto_reference = prevCamParams.auto_reference;
+      } else {
+        hasNewParams = true;
+      }
+    }
+  }
+
+  if (local_nh.hasParam("auto_shutter_max")) {
+    local_nh.getParam("auto_shutter_max", cam_params_.auto_shutter_max);
+    if (cam_params_.auto_shutter_max != prevCamParams.auto_shutter_max) {
+      if (cam_params_.auto_shutter_max < 0 || cam_params_.auto_shutter_max > 10) {
+        WARN_STREAM("Invalid requested auto_shutter_max: " << cam_params_.auto_shutter_max <<
+          "; using current auto_shutter_max: " << prevCamParams.auto_shutter_max);
+        cam_params_.auto_shutter_max = prevCamParams.auto_shutter_max;
+      } else {
+        hasNewParams = true;
+      }
+    }
+  }
+
+  if (local_nh.hasParam("auto_gain_max")) {
+    local_nh.getParam("auto_gain_max", cam_params_.auto_gain_max);
+    if (cam_params_.auto_gain_max != prevCamParams.auto_gain_max) {
+      if (cam_params_.auto_gain_max < 0 || cam_params_.auto_gain_max > 100) {
+        WARN_STREAM("Invalid requested auto_gain_max: " << cam_params_.auto_gain_max <<
+          "; using current auto_gain_max: " << prevCamParams.auto_gain_max);
+        cam_params_.auto_gain_max = prevCamParams.auto_gain_max;
+      } else {
+        hasNewParams = true;
+      }
+    }
+  }
+
+  if (local_nh.hasParam("auto_brightness_once")) {
+    local_nh.getParam("auto_brightness_once", cam_params_.auto_brightness_once);
+    if (cam_params_.auto_brightness_once != prevCamParams.auto_brightness_once) {
+      hasNewParams = true;
+    }
+  }
+
+  if (local_nh.hasParam("auto_speed")) {
+    local_nh.getParam("auto_speed", cam_params_.auto_speed);
+    if (cam_params_.auto_speed != prevCamParams.auto_speed) {
+      if (cam_params_.auto_speed < 0 || cam_params_.auto_speed > 100) {
+        WARN_STREAM("Invalid requested auto_speed: " << cam_params_.auto_speed <<
+          "; using current auto_speed: " << prevCamParams.auto_speed);
+        cam_params_.auto_speed = prevCamParams.auto_speed;
+      } else {
+        hasNewParams = true;
+      }
+    }
+  }
+
+  if (local_nh.hasParam("auto_hysteresis")) {
+    local_nh.getParam("auto_hysteresis", cam_params_.auto_hysteresis);
+    if (cam_params_.auto_hysteresis != prevCamParams.auto_hysteresis) {
+      if (cam_params_.auto_hysteresis < 0 || cam_params_.auto_hysteresis > 10) {
+        WARN_STREAM("Invalid requested auto_hysteresis: " << cam_params_.auto_hysteresis <<
+          "; using current auto_hysteresis: " << prevCamParams.auto_hysteresis);
+        cam_params_.auto_hysteresis = prevCamParams.auto_hysteresis;
+      } else {
+        hasNewParams = true;
+      }
+    }
+  }
+/////////////////////////////////////////////////////////////////////////////
+
   if (local_nh.hasParam("auto_white_balance")) {
     local_nh.getParam("auto_white_balance", cam_params_.auto_white_balance);
     if (cam_params_.auto_white_balance != prevCamParams.auto_white_balance) {
@@ -667,6 +823,82 @@ void UEyeCamNodelet::configCallback(ueye_cam::UEyeCamConfig& config, uint32_t le
     config.flash_duration = flash_duration;
   }
 
+/////////////////////////////////////////////////////////////////////////////
+  INT is_err = IS_SUCCESS;
+  double pval1, pval2, set_param;
+  IS_RECT setAOI;
+
+  if (config.aoi_left != cam_params_.aoi_left || config.aoi_top != cam_params_.aoi_top ||
+      config.aoi_width != cam_params_.aoi_width || config.aoi_height != cam_params_.aoi_height) {
+    setAOI.s32X     = config.aoi_left;
+    setAOI.s32Y     = config.aoi_top;
+    setAOI.s32Width = config.aoi_width;
+    setAOI.s32Height = config.aoi_height;
+    is_AOI(cam_handle_,IS_AOI_AUTO_BRIGHTNESS_SET_AOI, (void*)&setAOI, sizeof(setAOI));
+    if ((is_err = is_AOI(cam_handle_,
+      IS_AOI_AUTO_BRIGHTNESS_GET_AOI, (void*)&setAOI, sizeof(setAOI))) != IS_SUCCESS) {
+    }
+    config.aoi_left = setAOI.s32X;
+    config.aoi_top = setAOI.s32Y;
+    config.aoi_width = setAOI.s32Width;
+    config.aoi_height = setAOI.s32Height;
+  }
+
+  if (config.auto_reference != cam_params_.auto_reference) {
+    set_param = config.auto_reference;
+    is_SetAutoParameter(cam_handle_,IS_SET_AUTO_REFERENCE, &set_param, 0);
+    if ((is_err = is_SetAutoParameter(cam_handle_,
+      IS_GET_AUTO_REFERENCE, &pval1, &pval2)) != IS_SUCCESS) {
+    }
+    config.auto_reference = int(pval1);
+  }
+
+  if (config.auto_shutter_max != cam_params_.auto_shutter_max) {
+    set_param = config.auto_shutter_max;
+    is_SetAutoParameter(cam_handle_,IS_SET_AUTO_SHUTTER_MAX, &set_param, 0);
+    if ((is_err = is_SetAutoParameter(cam_handle_,
+      IS_GET_AUTO_SHUTTER_MAX, &pval1, &pval2)) != IS_SUCCESS) {
+    }
+    config.auto_shutter_max = double(pval1);
+  }
+
+  if (config.auto_gain_max != cam_params_.auto_gain_max) {
+    set_param = config.auto_gain_max;
+    is_SetAutoParameter(cam_handle_,IS_SET_AUTO_GAIN_MAX, &set_param, 0);
+    if ((is_err = is_SetAutoParameter(cam_handle_,
+      IS_GET_AUTO_GAIN_MAX, &pval1, &pval2)) != IS_SUCCESS) {
+    }
+    config.auto_gain_max = int(pval1);
+  }
+
+  if (config.auto_brightness_once != cam_params_.auto_brightness_once) {
+    set_param = config.auto_brightness_once;
+    is_SetAutoParameter(cam_handle_,IS_SET_AUTO_BRIGHTNESS_ONCE, &set_param, 0);
+    if ((is_err = is_SetAutoParameter(cam_handle_,
+      IS_GET_AUTO_BRIGHTNESS_ONCE, &pval1, &pval2)) != IS_SUCCESS) {
+    }
+    config.auto_brightness_once = bool(pval1);
+  }
+
+  if (config.auto_speed != cam_params_.auto_speed) {
+    set_param = config.auto_speed;
+    is_SetAutoParameter(cam_handle_,IS_SET_AUTO_SPEED, &set_param, 0);
+    if ((is_err = is_SetAutoParameter(cam_handle_,
+      IS_GET_AUTO_SPEED, &pval1, &pval2)) != IS_SUCCESS) {
+    }
+    config.auto_speed = int(pval1);
+  }
+
+  if (config.auto_hysteresis != cam_params_.auto_hysteresis) {
+    set_param = config.auto_hysteresis;
+    is_SetAutoParameter(cam_handle_,IS_SET_AUTO_HYSTERESIS, &set_param, 0);
+    if ((is_err = is_SetAutoParameter(cam_handle_,
+      IS_GET_AUTO_HYSTERESIS, &pval1, &pval2)) != IS_SUCCESS) {
+    }
+    config.auto_hysteresis = int(pval1);
+  }
+/////////////////////////////////////////////////////////////////////////////
+
   // Update local copy of parameter set to newly updated set
   cam_params_ = config;
 
@@ -757,6 +989,22 @@ INT UEyeCamNodelet::queryCamParams() {
     cam_params_.gain_boost = false;
   }
 
+/////////////////////////////////////////////////////////////////////////////
+IS_RECT rectAOI;
+
+if ((is_err = is_AOI(cam_handle_,
+    IS_AOI_AUTO_BRIGHTNESS_GET_AOI, (void*)&rectAOI, sizeof(rectAOI))) != IS_SUCCESS) {
+  ERROR_STREAM("Failed to query auto reference for [" <<
+    cam_name_ << "] (" << err2str(is_err) << ")");
+  return is_err;
+}
+cam_params_.aoi_width = rectAOI.s32Width;
+cam_params_.aoi_height = rectAOI.s32Height;
+cam_params_.aoi_left = rectAOI.s32X;
+cam_params_.aoi_top = rectAOI.s32Y;
+
+/////////////////////////////////////////////////////////////////////////////
+
   if ((is_err = is_SetAutoParameter(cam_handle_,
       IS_GET_ENABLE_AUTO_SENSOR_SHUTTER, &pval1, &pval2)) != IS_SUCCESS &&
       (is_err = is_SetAutoParameter(cam_handle_,
@@ -792,6 +1040,57 @@ INT UEyeCamNodelet::queryCamParams() {
   }
   cam_params_.white_balance_red_offset = pval1;
   cam_params_.white_balance_blue_offset = pval2;
+
+/////////////////////////////////////////////////////////////////////////////
+  if ((is_err = is_SetAutoParameter(cam_handle_,
+      IS_GET_AUTO_REFERENCE, &pval1, &pval2)) != IS_SUCCESS) {
+    ERROR_STREAM("Failed to query auto reference for [" <<
+      cam_name_ << "] (" << err2str(is_err) << ")");
+    return is_err;
+  }
+  cam_params_.auto_reference = pval1;
+
+  if ((is_err = is_SetAutoParameter(cam_handle_,
+      IS_GET_AUTO_SHUTTER_MAX, &pval1, &pval2)) != IS_SUCCESS) {
+    ERROR_STREAM("Failed to query auto shutter max for [" <<
+      cam_name_ << "] (" << err2str(is_err) << ")");
+    return is_err;
+  }
+  cam_params_.auto_shutter_max = pval1;
+
+  if ((is_err = is_SetAutoParameter(cam_handle_,
+      IS_GET_AUTO_GAIN_MAX, &pval1, &pval2)) != IS_SUCCESS) {
+    ERROR_STREAM("Failed to query auto gain max for [" <<
+      cam_name_ << "] (" << err2str(is_err) << ")");
+    return is_err;
+  }
+  cam_params_.auto_gain_max = pval1;
+
+  if ((is_err = is_SetAutoParameter(cam_handle_,
+      IS_GET_AUTO_BRIGHTNESS_ONCE, &pval1, &pval2)) != IS_SUCCESS) {
+    ERROR_STREAM("Failed to query auto brightness once for [" <<
+      cam_name_ << "] (" << err2str(is_err) << ")");
+    return is_err;
+  }
+  cam_params_.auto_brightness_once = pval1;
+
+  if ((is_err = is_SetAutoParameter(cam_handle_,
+      IS_GET_AUTO_SPEED, &pval1, &pval2)) != IS_SUCCESS) {
+    ERROR_STREAM("Failed to query auto speed for [" <<
+      cam_name_ << "] (" << err2str(is_err) << ")");
+    return is_err;
+  }
+  cam_params_.auto_speed = pval1;
+
+  if ((is_err = is_SetAutoParameter(cam_handle_,
+      IS_GET_AUTO_HYSTERESIS, &pval1, &pval2)) != IS_SUCCESS) {
+    ERROR_STREAM("Failed to query auto hysteresis for [" <<
+      cam_name_ << "] (" << err2str(is_err) << ")");
+    return is_err;
+  }
+  cam_params_.auto_hysteresis = pval1;
+/////////////////////////////////////////////////////////////////////////////
+
 
   IO_FLASH_PARAMS currFlashParams;
   if ((is_err = is_IO(cam_handle_, IS_IO_CMD_FLASH_GET_PARAMS,
@@ -980,7 +1279,7 @@ void UEyeCamNodelet::frameGrabLoop() {
         // Initialize shared pointers from member messages for nodelet intraprocess publishing
         sensor_msgs::ImagePtr img_msg_ptr(new sensor_msgs::Image(ros_image_));
         sensor_msgs::CameraInfoPtr cam_info_msg_ptr(new sensor_msgs::CameraInfo(ros_cam_info_));
-        
+
         // Initialize/compute frame timestamp based on clock tick value from camera
         if (init_ros_time_.isZero()) {
           if(getClockTick(&init_clock_tick_)) {
@@ -1020,7 +1319,7 @@ void UEyeCamNodelet::frameGrabLoop() {
         bool throttle_curr_frame = false;
         output_rate_mutex_.lock();
         if (!cam_params_.ext_trigger_mode && cam_params_.output_rate > 0) {
-          if (init_publish_time_.is_zero()) { // Set reference time 
+          if (init_publish_time_.is_zero()) { // Set reference time
             init_publish_time_ = img_msg_ptr->header.stamp;
           } else {
             double time_elapsed = (img_msg_ptr->header.stamp - init_publish_time_).toSec();
