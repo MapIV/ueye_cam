@@ -1394,6 +1394,18 @@ bool UEyeCamNodelet::fillMsgData(sensor_msgs::Image& img) const {
   img.width = cam_aoi_.s32Width;
   img.height = cam_aoi_.s32Height;
   img.encoding = ENCODING_DICTIONARY.at(color_mode_);
+    if(cam_params_.color_mode=="bayer_rggb")
+  {
+    if (cam_params_.flip_upd && cam_params_.flip_lr){
+      img.encoding = "bayer_grbg8";
+    } else if (cam_params_.flip_upd)
+    {
+      img.encoding = "bayer_gbrg8";
+    }else if (cam_params_.flip_lr)
+    {
+      img.encoding = "bayer_gbrg8";
+    }
+  }
   img.step = img.width * sensor_msgs::image_encodings::numChannels(img.encoding) * sensor_msgs::image_encodings::bitDepth(img.encoding)/8;
   img.data.resize(img.height * img.step);
 
