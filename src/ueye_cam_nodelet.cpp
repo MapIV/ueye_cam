@@ -1394,18 +1394,58 @@ bool UEyeCamNodelet::fillMsgData(sensor_msgs::Image& img) const {
   img.width = cam_aoi_.s32Width;
   img.height = cam_aoi_.s32Height;
   img.encoding = ENCODING_DICTIONARY.at(color_mode_);
-    if(cam_params_.color_mode=="bayer_rggb")
+
+    if(cam_params_.color_mode=="bayer_rggb8")
   {
     if (cam_params_.flip_upd && cam_params_.flip_lr){
-      img.encoding = "bayer_grbg8";
+      img.encoding = "bayer_bggr8";
     } else if (cam_params_.flip_upd)
     {
       img.encoding = "bayer_gbrg8";
     }else if (cam_params_.flip_lr)
     {
-      img.encoding = "bayer_gbrg8";
+      img.encoding = "bayer_grbg8";
     }
   }
+
+    if(cam_params_.color_mode=="bayer_rggb10")
+  {
+    if (cam_params_.flip_upd && cam_params_.flip_lr){
+      img.encoding = "bayer_bggr10";
+    } else if (cam_params_.flip_upd)
+    {
+      img.encoding = "bayer_gbrg10";
+    }else if (cam_params_.flip_lr)
+    {
+      img.encoding = "bayer_grbg10";
+    }
+  }
+    if(cam_params_.color_mode=="bayer_rggb12")
+  {
+    if (cam_params_.flip_upd && cam_params_.flip_lr){
+      img.encoding = "bayer_bggr12";
+    } else if (cam_params_.flip_upd)
+    {
+      img.encoding = "bayer_gbrg12";
+    }else if (cam_params_.flip_lr)
+    {
+      img.encoding = "bayer_grbg12";
+    }
+  }
+
+    if(cam_params_.color_mode=="bayer_rggb16")
+  {
+    if (cam_params_.flip_upd && cam_params_.flip_lr){
+      img.encoding = "bayer_bggr16";
+    } else if (cam_params_.flip_upd)
+    {
+      img.encoding = "bayer_gbrg16";
+    }else if (cam_params_.flip_lr)
+    {
+      img.encoding = "bayer_grbg16";
+    }
+  }
+
   img.step = img.width * sensor_msgs::image_encodings::numChannels(img.encoding) * sensor_msgs::image_encodings::bitDepth(img.encoding)/8;
   img.data.resize(img.height * img.step);
 
