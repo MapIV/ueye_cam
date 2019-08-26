@@ -1271,8 +1271,8 @@ void UEyeCamNodelet::frameGrabLoop() {
             if (abs((ros::Time::now() - init_ros_time_).toSec()) > abs((ros::Time::now() - (init_ros_time_-ros::Duration(3600,0))).toSec())) { init_ros_time_ -= ros::Duration(3600,0); }
           }
         }
-        //img_msg_ptr->header.stamp = cam_info_msg_ptr->header.stamp = ros::Time::now();  //Fix time used in pc_timestamp by sekino
-        img_msg_ptr->header.stamp = cam_info_msg_ptr->header.stamp = getImageTimestamp();  //Fix time used in camra_timestamp by sekino
+        img_msg_ptr->header.stamp = cam_info_msg_ptr->header.stamp = ros::Time::now();  //Fix time used in pc_timestamp by sekino
+        //img_msg_ptr->header.stamp = cam_info_msg_ptr->header.stamp = getImageTimestamp();  //Fix time used in camra_timestamp by sekino
         //img_msg_ptr->header.stamp = cam_info_msg_ptr->header.stamp = getImageTickTimestamp();
 
         // Process new frame
