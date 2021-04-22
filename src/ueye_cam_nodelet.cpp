@@ -183,6 +183,7 @@ void UEyeCamNodelet::onInit() {
   // Initiate camera and start capture
   if (connectCam() != IS_SUCCESS) {
     ERROR_STREAM("Failed to initialize [" << cam_name_ << "]");
+    ros::shutdown();
     return;
   }
 
