@@ -645,7 +645,7 @@ if (local_nh.hasParam("aoi_top")) {
     // NOTE: although this might not be needed, assume that parseROSParams()
     //       is called only once per nodelet, thus ignore cost
     if ((is_err = syncCamConfig()) != IS_SUCCESS) return is_err;
-
+ROS_ERROR("A");
     // Check for mutual exclusivity among requested sensor parameters
     if (!cam_params_.auto_exposure) { // Auto frame rate requires auto shutter
       cam_params_.auto_frame_rate = false;
@@ -788,7 +788,7 @@ void UEyeCamNodelet::configCallback(ueye_cam::UEyeCamConfig& config, uint32_t le
       config.exposure != cam_params_.exposure) {
     if (setExposure(config.auto_exposure, config.exposure) != IS_SUCCESS) return;
   }
-
+ROS_ERROR("B");///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   if (config.auto_white_balance != cam_params_.auto_white_balance ||
       config.white_balance_red_offset != cam_params_.white_balance_red_offset ||
       config.white_balance_blue_offset != cam_params_.white_balance_blue_offset) {
@@ -887,6 +887,12 @@ void UEyeCamNodelet::configCallback(ueye_cam::UEyeCamConfig& config, uint32_t le
     config.auto_hysteresis = int(pval1);
   }
   //
+
+    bool tmp = false;
+    setExposure(tmp, config.exposure);
+    set_param = config.auto_shutter_max;
+    is_SetAutoParameter(cam_handle_,IS_SET_AUTO_SHUTTER_MAX, &set_param, 0);
+    setExposure(config.auto_exposure, config.exposure);
 
   // Update local copy of parameter set to newly updated set
   cam_params_ = config;
